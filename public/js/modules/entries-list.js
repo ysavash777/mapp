@@ -132,10 +132,12 @@ async function confirmSaveEdit() {
   const fechaVenc  = tipo === 'unidades' ? (document.getElementById('edit-fecha') ? document.getElementById('edit-fecha').value : null) : null;
   const comentario = tipo === 'otro' ? (document.getElementById('edit-comentario') ? document.getElementById('edit-comentario').value.trim() : null) : null;
   const qty        = Math.max(1, parseInt(document.getElementById('edit-qty') ? document.getElementById('edit-qty').value : 1) || 1);
-  const e = entries.find(x => x.id === editingId);
+  // FIX: capturar el id ANTES de closeEditModal(), que lo pone en null
+  const idToUpdate = editingId;
+  const e = entries.find(x => x.id === idToUpdate);
   if (!e || !tipo) return;
   closeEditModal();
-  await updateEntry(editingId, { tipo, subtipo, fechaVenc, comentario, qty });
+  await updateEntry(idToUpdate, { tipo, subtipo, fechaVenc, comentario, qty });
   showToast('Guardado', 'success');
 }
 
