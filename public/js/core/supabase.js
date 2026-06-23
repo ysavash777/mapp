@@ -10,7 +10,10 @@ const SUPABASE_URL  = 'https://eadkwfthmsiuorzxhscp.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVhZGt3ZnRobXNpdW9yenhoc2NwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MjE2ODE4MSwiZXhwIjoyMDk3NzQ0MTgxfQ.NEsD8hC2_ximZ9VfbfvmnOfgNV79Cb-uuBiOp5Yx8d8';
 
 // Cliente Supabase (cargado via CDN en index.html)
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+// NOTA: se llama "supabaseClient" (no "supabase") porque el bundle UMD
+// de la librería ya expone un global "supabase" — usar el mismo nombre
+// para el cliente choca con esa declaración y rompe todo el script.
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
   realtime: {
     params: { eventsPerSecond: 10 }
   }
