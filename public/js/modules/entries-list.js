@@ -58,6 +58,9 @@ async function deleteEntry(id) {
   if (!confirmed) return;
 
   await removeEntry(id);
+  // FIX: actualizar array local y redibujar sin esperar Realtime
+  entries = entries.filter(x => x.id !== id);
+  renderList();
   showToast('Registro eliminado', 'warn');
 }
 
