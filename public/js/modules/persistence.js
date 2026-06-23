@@ -28,8 +28,9 @@ async function _sendOp(op) {
     const { error } = await supabaseClient.from('entries').insert([op.entry]);
     if (error) throw error;
   } else if (op.kind === 'update') {
-    const { error } = await supabaseClient.from('entries').update(op.patch).eq('id', op.entryId);
+    const { error, data } = await supabaseClient.from('entries').update(op.patch).eq('id', op.entryId).select('id');
     if (error) throw error;
+    if (!data || data.length === 0) console.warn('[GDSMapiX] update sin efecto para id:', op.entryId, '— ¿RLS bloqueando o id incorrecto?');
   } else if (op.kind === 'delete') {
     const { error } = await supabaseClient.from('entries').delete().eq('id', op.entryId);
     if (error) throw error;
@@ -71,9 +72,27 @@ async function saveEntry(entry) {
 }
 
 async function updateEntry(id, patch) {
-  // Renombrar fechaVenc → fecha_venc si viene en el patch
-  const row = { ...patch };
-  if ('fechaVenc' in row) { row.fecha_venc = row.fechaVenc; delete row.fechaVenc; }
+  // Mapeo completo de campos JS → columnas Supabase (igual que en saveEntry)
+  const fieldMap = {
+    ref:        'ref',
+    dun:        'dun',
+    desc:       'desc',
+    tipo:       'tipo',
+    subtipo:    'subtipo',
+    fechaVenc:  'fecha_venc',
+    comentario: 'comentario',
+    qty:        'qty',
+    user:       'user',
+    ts:         'ts',
+  };
+  const row = {};
+  for (const [jsKey, dbKey] of Object.entries(fieldMap)) {
+    if (jsKey in patch) row[dbKey] = patch[jsKey] ?? null;
+  }
+  if (!Object.keys(row).length) {
+    console.warn('[GDSMapiX] updateEntry: patch vacío, nada que actualizar.');
+    return;
+  }
   const op = { qid: uid(), kind: 'update', projectId: activeProjectId, entryId: id, patch: row, ts: Date.now() };
   _enqueue(op);
   await _attemptOp(op);
