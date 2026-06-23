@@ -19,7 +19,7 @@ async function openCatalogSettings() {
 
 async function _fetchCatalogStatus() {
   try {
-    const { data, error } = await supabase.storage.from(CATALOG_BUCKET).list('', { limit: 10 });
+    const { data, error } = await supabaseClient.storage.from(CATALOG_BUCKET).list('', { limit: 10 });
     if (error) throw error;
     const EXPECTED = ['variables.xlsx', 'referencia.xlsx'];
     _catalogStatus = EXPECTED.map(name => {
@@ -113,7 +113,7 @@ function _renderCatalogPanel() {
       // Renombrar al nombre canónico por si el usuario subió un archivo con otro nombre
       const renamedFile = new File([file], catalogName, { type: file.type });
 
-      const { error } = await supabase.storage
+      const { error } = await supabaseClient.storage
         .from(CATALOG_BUCKET)
         .upload(catalogName, renamedFile, { upsert: true, contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       if (error) throw error;

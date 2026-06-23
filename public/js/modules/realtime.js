@@ -32,7 +32,7 @@ async function connectRealtime(projectId) {
   await _loadEntries(projectId);
 
   // Suscribirse a cambios en tiempo real sobre las entries de este proyecto
-  _realtimeChannel = supabase
+  _realtimeChannel = supabaseClient
     .channel(`entries:${projectId}`)
     .on(
       'postgres_changes',
@@ -62,7 +62,7 @@ async function connectRealtime(projectId) {
 
 async function _loadEntries(projectId) {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('entries')
       .select('*')
       .eq('project_id', projectId)
@@ -96,7 +96,7 @@ function _rowToEntry(row) {
 
 function disconnectRealtime() {
   if (_realtimeChannel) {
-    supabase.removeChannel(_realtimeChannel);
+    supabaseClient.removeChannel(_realtimeChannel);
     _realtimeChannel = null;
   }
   const dot = document.getElementById('live-dot');

@@ -25,13 +25,13 @@ function _dequeue(qid) {
 // ── Operaciones Supabase ─────────────────────────
 async function _sendOp(op) {
   if (op.kind === 'create') {
-    const { error } = await supabase.from('entries').insert([op.entry]);
+    const { error } = await supabaseClient.from('entries').insert([op.entry]);
     if (error) throw error;
   } else if (op.kind === 'update') {
-    const { error } = await supabase.from('entries').update(op.patch).eq('id', op.entryId);
+    const { error } = await supabaseClient.from('entries').update(op.patch).eq('id', op.entryId);
     if (error) throw error;
   } else if (op.kind === 'delete') {
-    const { error } = await supabase.from('entries').delete().eq('id', op.entryId);
+    const { error } = await supabaseClient.from('entries').delete().eq('id', op.entryId);
     if (error) throw error;
   }
 }

@@ -57,7 +57,7 @@ async function confirmClearAll() {
   if (!confirmed) return;
 
   try {
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from('entries')
       .delete()
       .eq('project_id', activeProjectId);

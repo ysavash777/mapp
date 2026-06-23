@@ -19,14 +19,14 @@ function goToProjects() {
 
 async function loadProjects() {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('projects')
       .select('id, name, created_by, created_at')
       .order('created_at', { ascending: false });
     if (error) throw error;
     // Cargar conteo de entries por proyecto
     const counts = await Promise.all(data.map(async p => {
-      const { count } = await supabase
+      const { count } = await supabaseClient
         .from('entries')
         .select('id', { count: 'exact', head: true })
         .eq('project_id', p.id);
@@ -105,7 +105,7 @@ async function handleDeleteProject(id, name) {
   if (!confirmed) return;
   try {
     // Las entries se borran en cascada (ON DELETE CASCADE en el schema)
-    const { error } = await supabase.from('projects').delete().eq('id', id);
+    const { error } = await supabaseClient.from('projects').delete().eq('id', id);
     if (error) throw error;
     showToast('Proyecto eliminado', 'warn');
   } catch (e) {
@@ -133,7 +133,7 @@ async function createProject() {
 
   const id = uid();
   try {
-    const { error } = await supabase.from('projects').insert([{
+    const { error } = await supabaseClient.from('projects').insert([{
       id, name, created_by: currentUser || 'Sistema'
     }]);
     if (error) throw error;

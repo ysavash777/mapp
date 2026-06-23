@@ -8,10 +8,13 @@
 //  3. Selección manual del usuario
 // ═══════════════════════════════════════════════
 
-const CATALOG_BUCKET = 'catalogs';
+// NOTA: CATALOG_BUCKET se declara en modules/catalog-settings.js.
+// No volver a declararlo acá: todos los <script> clásicos comparten
+// el mismo scope global, así que una segunda "const CATALOG_BUCKET"
+// rompe el script entero con un SyntaxError de redeclaración.
 
 async function _fetchFromStorage(filename) {
-  const { data, error } = await supabase.storage
+  const { data, error } = await supabaseClient.storage
     .from(CATALOG_BUCKET)
     .download(filename);
   if (error) throw error;
